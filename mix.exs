@@ -22,7 +22,7 @@ defmodule MagickBytes.MixProject do
 
   defp package do
     [
-      files: ["lib"],
+      files: ["lib", "mix.exs"],
       maintainers: ["Vinicius Moraes"],
       licenses: ["Apache-2.0"],
       links: %{"Github" => "https://github.com/ding-an-sich/magick_bytes"}
