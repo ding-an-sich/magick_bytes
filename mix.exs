@@ -31,7 +31,8 @@ defmodule MagickBytes.MixProject do
 
   defp deps do
     [
-      {:stream_data, "~> 0.5", only: [:dev, :test]}
+      {:stream_data, "~> 0.5", only: [:dev, :test]},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 end
