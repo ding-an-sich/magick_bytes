@@ -27,3 +27,6 @@ magick_bytes-*.tar
 
 # ElixirLS
 .elixir_ls
+
+# Archives for testing
+/test/archives

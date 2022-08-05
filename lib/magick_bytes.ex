@@ -13,28 +13,40 @@ defmodule MagickBytes do
 
   ## Examples
 
-      iex> MagickBytes.mime("./test/fixtures/my_gzip_file_disguised_as.txt")
+      iex> MagickBytes.mime("./test/archives/my_gzip_file_disguised_as.txt")
       {:ok, "application/gzip"}
 
   """
   @spec mime(path :: Path.t()) :: {:ok, String.t()} | {:error, atom()}
   def mime(path) when is_binary(path) do
-    with {:ok, file} <- File.open(path),
-         binary <- IO.binread(file, 16),
+    with {:ok, file} <- File.open(path, [{:read_ahead, 640}]),
+         result <- try_match(file),
          :ok <- File.close(file) do
-      {:halt, match} = Matcher.match(binary)
-      {:ok, match}
+      result
     end
   end
 
-  @spec mime!(path :: Path.t()) :: String.t() | no_return()
-  def mime!(path) when is_binary(path) do
-    file = File.open!(path)
-    data = IO.binread(file, 16)
+  defp try_match(file) do
+    with {:ok, byte} <- :file.pread(file, 0, 1),
+         {:continue, :no_match, _bytes} <- Matcher.match(byte) do
+      try_match(file, 1, byte)
+    else
+      {:error, :einval} -> {:error, :no_match}
+      {:match, match} -> {:ok, match}
+    end
+  end
 
-    File.close(file)
+  defp try_match(_file, 640, _), do: {:error, :no_match}
 
-    {:halt, match} = Matcher.match(data)
-    match
+  defp try_match(file, current_offset, bytes_read) do
+    with {:ok, byte} <- :file.pread(file, current_offset, 1),
+         {:continue, :no_match, bytes} <-
+           Matcher.match(<<bytes_read::binary>> <> <<byte::binary>>) do
+      try_match(file, current_offset + 1, bytes)
+    else
+      {:error, :einval} -> {:error, :no_match}
+      {:match, match} -> {:ok, match}
+      error -> error
+    end
   end
 end

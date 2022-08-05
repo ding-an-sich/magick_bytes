@@ -9,7 +9,8 @@ defmodule MagickBytes.MixProject do
       version: "0.1.0",
       elixir: "~> 1.13",
       description: @description,
-      package: package()
+      package: package(),
+      deps: deps()
     ]
   end
 
@@ -25,6 +26,12 @@ defmodule MagickBytes.MixProject do
       maintainers: ["Vinicius Moraes"],
       licenses: ["Apache-2.0"],
       links: %{"Github" => "www"}
+    ]
+  end
+
+  defp deps do
+    [
+      {:stream_data, "~> 0.5", only: [:dev, :test]}
     ]
   end
 end
