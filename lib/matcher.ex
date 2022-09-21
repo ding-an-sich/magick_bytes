@@ -4,6 +4,10 @@ defmodule MagickBytes.Matcher do
     {:match, "application/gzip"}
   end
 
+  def match(<<80, 75>>) do
+    {:match, "application/zip"}
+  end
+
   # FF D8 FF
   def match(<<255, 216, 255>>) do
     {:match, "image/jpeg"}
@@ -52,13 +56,14 @@ defmodule MagickBytes.Matcher do
   end
 
   # 1A 45 DF A3
+  # EBML
   def match(<<26, 69, 223, 163, rest::binary>> = bytes) do
     cond do
       pattern_match(rest, <<119, 101, 98, 109>>) ->
         {:match, "video/webm"}
 
       pattern_match(rest, <<109, 97, 116, 114, 111, 115, 107, 97>>) ->
-        {:match, "video/matroska"}
+        {:match, "video/x-matroska"}
 
       true ->
         {:continue, :no_match, bytes}
