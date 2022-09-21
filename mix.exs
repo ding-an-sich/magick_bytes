@@ -6,17 +6,11 @@ defmodule MagickBytes.MixProject do
   def project do
     [
       app: :magick_bytes,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.13",
       description: @description,
       package: package(),
       deps: deps()
-    ]
-  end
-
-  def application do
-    [
-      extra_applications: [:logger]
     ]
   end
 
