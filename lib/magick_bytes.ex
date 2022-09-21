@@ -31,12 +31,13 @@ defmodule MagickBytes do
          {:continue, :no_match, _bytes} <- Matcher.match(byte) do
       try_match(file, 1, byte)
     else
+      :eof -> {:error, :no_match}
       {:error, :einval} -> {:error, :no_match}
       {:match, match} -> {:ok, match}
     end
   end
 
-  defp try_match(_file, 640, _), do: {:error, :no_match}
+  defp try_match(_file, 640, _bytes), do: {:error, :no_match}
 
   defp try_match(file, current_offset, bytes_read) do
     with {:ok, byte} <- :file.pread(file, current_offset, 1),
@@ -44,6 +45,7 @@ defmodule MagickBytes do
            Matcher.match(<<bytes_read::binary>> <> <<byte::binary>>) do
       try_match(file, current_offset + 1, bytes)
     else
+      :eof -> {:error, :no_match}
       {:error, :einval} -> {:error, :no_match}
       {:match, match} -> {:ok, match}
       error -> error
